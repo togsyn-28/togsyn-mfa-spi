@@ -1,0 +1,2 @@
+com.togsyn.tech.keycloak.mfa.TotpEnrollmentResourceProviderFactory
+com.togsyn.tech.keycloak.mfa.MfaLoginResourceProviderFactory
