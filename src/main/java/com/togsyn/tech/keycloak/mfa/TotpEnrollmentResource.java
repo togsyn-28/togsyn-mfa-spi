@@ -155,6 +155,7 @@ public class TotpEnrollmentResource {
         OTPCredentialProvider provider = (OTPCredentialProvider) session.getProvider(CredentialProvider.class, "keycloak-otp");
         provider.createCredential(realm, user, credential);
 
+
         user.removeRequiredAction(UserModel.RequiredAction.CONFIGURE_TOTP);
 
         Map<String, Object> body = new LinkedHashMap<>();

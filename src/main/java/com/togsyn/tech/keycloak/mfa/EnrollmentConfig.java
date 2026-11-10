@@ -27,7 +27,7 @@ final class EnrollmentConfig {
      */
     static Set<String> loginOrigins() {
         Set<String> origins = new HashSet<>(platformOrigins());
-        origins.addAll(csv("MFA_LOGIN_ORIGINS", ""));
+        origins.addAll(csv("MFA_LOGIN_ORIGINS", "http://localhost:4200"));
         return origins;
     }
 

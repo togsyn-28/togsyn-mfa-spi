@@ -1,3 +1,4 @@
 com.togsyn.tech.keycloak.mfa.PasskeyDirectGrantAuthenticator
 com.togsyn.tech.keycloak.mfa.MfaUiPasskeyAuthenticatorFactory
 com.togsyn.tech.keycloak.mfa.DirectGrantOtpAuthenticatorFactory
+com.togsyn.tech.keycloak.mfa.PasskeyDirectGrantAuthenticatorFactory

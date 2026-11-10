@@ -49,10 +49,17 @@ public class PasskeyDirectGrantAuthenticator extends AbstractDirectGrantAuthenti
     public static final String PROVIDER_ID = "mfa-passkey-direct-grant";
     public static final String PARAM_ASSERTION = "passkey_assertion";
 
+
+
     @Override
     public void authenticate(AuthenticationFlowContext context) {
+        System.out.println("[PASSKEY] authenticate() ENTERED build=" + PasskeyDirectGrantAuthenticatorFactory.BUILD);
+        System.out.println("BRO DEBUG VERSION NOV10");
+        String raw = context.getHttpRequest().getDecodedFormParameters().getFirst("passkey_assertion");
         MultivaluedMap<String, String> params = context.getHttpRequest().getDecodedFormParameters();
-        String raw = params.getFirst(PARAM_ASSERTION);
+//        String raw = params.getFirst(PARAM_ASSERTION);
+        System.out.println("[PASSKEY] assertion present=" + (raw != null));
+
         if (raw == null || raw.isBlank()) {
             context.attempted(); // not a passkey login: let the password sub-flow handle it
             return;
@@ -156,14 +163,38 @@ public class PasskeyDirectGrantAuthenticator extends AbstractDirectGrantAuthenti
         credential.setAuthenticationRequest(new AuthenticationRequest(credentialId, authenticatorData, clientDataJson, signature));
         credential.setAuthenticationParameters(
                 new WebAuthnCredentialModelInput.KeycloakWebAuthnAuthenticationParameters(server, userVerificationRequired));
+        System.out.println("============== PASSKEY DEBUG ==============");
         // TEMP DIAGNOSTIC - remove after testing
+// TEMP DIAGNOSTIC - remove after testing
         try {
+
+            System.out.println("========== PASSKEY DEBUG ==========");
+
+            user.credentialManager()
+                    .getStoredCredentialsByTypeStream(WebAuthnCredentialModel.TYPE_PASSWORDLESS)
+                    .forEach(c -> {
+                        WebAuthnCredentialModel model =
+                                WebAuthnCredentialModel.createFromCredentialModel(c);
+
+                        System.out.println(
+                                "STORED CRED ID = " +
+                                        model.getWebAuthnCredentialData().getCredentialId()
+                        );
+                    });
+
+            System.out.println(
+                    "ASSERTION CRED ID = " +
+                            Base64Url.encode(credentialId)
+            );
+
             boolean idStored = user.credentialManager()
                     .getStoredCredentialsByTypeStream(WebAuthnCredentialModel.TYPE_PASSWORDLESS)
                     .anyMatch(c -> java.util.Arrays.equals(
                             WebAuthnCredentialModel.createFromCredentialModel(c)
                                     .getWebAuthnCredentialData().getCredentialId().getBytes(),
                             credentialId));
+
+            System.out.println("========== END PASSKEY DEBUG ==========");
 
             byte[] expectedHash = java.security.MessageDigest.getInstance("SHA-256")
                     .digest(rpId.getBytes(StandardCharsets.UTF_8));
@@ -226,17 +257,19 @@ public class PasskeyDirectGrantAuthenticator extends AbstractDirectGrantAuthenti
 
     @Override
     public boolean requiresUser() {
+        System.out.println("[PASSKEY] requiresUser() ->");
         return false;
     }
 
     @Override
-    public boolean configuredFor(KeycloakSession session, RealmModel realm, UserModel user) {
+    public boolean configuredFor(KeycloakSession s, RealmModel r, UserModel u) {
+        System.out.println("[PASSKEY] configuredFor() -> true");
         return true;
     }
 
-    @Override
-    public void setRequiredActions(KeycloakSession session, RealmModel realm, UserModel user) {
-    }
+
+    @Override public void setRequiredActions(KeycloakSession s, RealmModel r, UserModel u) { }
+
 
     @Override
     public boolean isUserSetupAllowed() {
@@ -282,4 +315,6 @@ public class PasskeyDirectGrantAuthenticator extends AbstractDirectGrantAuthenti
     public String getId() {
         return PROVIDER_ID;
     }
+    @Override public void action(AuthenticationFlowContext ctx) { }
+    @Override public void close() { }
 }

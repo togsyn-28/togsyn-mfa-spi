@@ -70,6 +70,9 @@ public class PasskeyLoginResource {
         // Browser apps on another origin (EduTecJob) may read this answer, but only the configured ones.
         // The request has no body and no custom headers, so the browser sends no preflight.
         String origin = session.getContext().getHttpRequest().getHttpHeaders().getHeaderString("Origin");
+        System.out.println("ORIGIN = " + origin);
+        System.out.println("LOGIN ORIGINS = " + EnrollmentConfig.loginOrigins());
+
         if (origin != null && EnrollmentConfig.loginOrigins().contains(origin)) {
             response.header("Access-Control-Allow-Origin", origin).header("Vary", "Origin");
         }
